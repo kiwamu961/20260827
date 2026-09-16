@@ -1,7 +1,40 @@
 const MAX_FILES = 50;
 const ACCEPTED_TYPES = new Set(["image/jpeg", "image/png"]);
 const CATEGORIES = ["すべて", "浴室", "トイレ", "リビング", "玄関", "キッチン", "洗面所", "バルコニー", "未分類"];
-const CATEGORY_CYCLE = ["リビング", "キッチン", "浴室", "トイレ", "玄関", "洗面所", "バルコニー"];
+
+// COCOの標準80クラスのうち、物件写真の判定に使う候補クラス（日本語表示名付き）。
+// COCOには「浴槽」「玄関ドア」に相当するクラスがないため、関連性の高いクラスで代用する。
+const COCO_OBJECT_POOL = [
+  { name: "toilet", label: "便器" },
+  { name: "sink", label: "シンク" },
+  { name: "toothbrush", label: "歯ブラシ" },
+  { name: "hair drier", label: "ドライヤー" },
+  { name: "oven", label: "オーブン" },
+  { name: "microwave", label: "電子レンジ" },
+  { name: "refrigerator", label: "冷蔵庫" },
+  { name: "toaster", label: "トースター" },
+  { name: "couch", label: "ソファ" },
+  { name: "tv", label: "テレビ" },
+  { name: "dining table", label: "ダイニングテーブル" },
+  { name: "bed", label: "ベッド" },
+  { name: "backpack", label: "バックパック" },
+  { name: "umbrella", label: "傘" },
+  { name: "potted plant", label: "観葉植物" },
+  { name: "bench", label: "ベンチ" },
+];
+
+// カテゴリ判定ルール。優先順に評価し、対象クラスの検出個数の合計が
+// threshold（N個）以上になった最初のカテゴリを採用する。
+// COCOに存在しないクラス（浴槽・シャワー等）は、代用クラスで近似している。
+const CATEGORY_RULES = [
+  { category: "キッチン", objects: ["oven", "microwave", "refrigerator", "toaster"], threshold: 1 },
+  { category: "浴室", objects: ["toothbrush", "hair drier"], threshold: 1 },
+  { category: "トイレ", objects: ["toilet"], threshold: 1 },
+  { category: "洗面所", objects: ["sink"], threshold: 1 },
+  { category: "リビング", objects: ["couch", "tv", "dining table", "bed"], threshold: 1 },
+  { category: "玄関", objects: ["backpack", "umbrella"], threshold: 1 },
+  { category: "バルコニー", objects: ["potted plant", "bench"], threshold: 1 },
+];
 
 const uploadView = document.getElementById("uploadView");
 const processingView = document.getElementById("processingView");
@@ -36,6 +69,48 @@ let processingTimer;
 function formatFileSize(bytes) {
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+// ファイル名とサイズから決定的な擬似乱数を生成する（同じ写真は常に同じ検出結果になる）。
+function createSeededRandom(seedText) {
+  let seed = 0;
+  for (let i = 0; i < seedText.length; i += 1) {
+    seed = (seed * 31 + seedText.charCodeAt(i)) >>> 0;
+  }
+  return () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 0xffffffff;
+  };
+}
+
+// YOLO推論の代わりに、写真ごとにCOCOクラスの検出結果を疑似生成する。
+// 実際のモデル・学習データを接続する際は、この関数の戻り値だけを差し替えればよい。
+function detectObjects(file, index) {
+  const random = createSeededRandom(`${file.name}-${file.size}-${index}`);
+  const detected = [];
+
+  COCO_OBJECT_POOL.forEach((object) => {
+    if (random() < 0.32) {
+      const count = 1 + Math.floor(random() * 2);
+      const confidence = Math.round((0.6 + random() * 0.35) * 100) / 100;
+      detected.push({ ...object, count, confidence });
+    }
+  });
+
+  return detected;
+}
+
+// 検出物の個数がルールのthreshold（N個）以上になった最初のカテゴリを採用する。
+// 該当するルールがなければ未分類として扱う。
+function classifyDetections(detectedObjects) {
+  for (const rule of CATEGORY_RULES) {
+    const matchedObjects = detectedObjects.filter((object) => rule.objects.includes(object.name));
+    const totalCount = matchedObjects.reduce((sum, object) => sum + object.count, 0);
+    if (totalCount >= rule.threshold) {
+      return { category: rule.category, matchedObjects };
+    }
+  }
+  return { category: "未分類", matchedObjects: [] };
 }
 
 function showError(message) {
@@ -125,10 +200,11 @@ function startProcessing() {
 
     if (processed === total) {
       clearInterval(processingTimer);
-      classifiedPhotos = selectedFiles.map((file, index) => ({
-        file,
-        category: CATEGORY_CYCLE[index % CATEGORY_CYCLE.length],
-      }));
+      classifiedPhotos = selectedFiles.map((file, index) => {
+        const detectedObjects = detectObjects(file, index);
+        const { category, matchedObjects } = classifyDetections(detectedObjects);
+        return { file, category, detectedObjects, matchedObjects };
+      });
       showResultsButton.hidden = false;
     }
   }, 280);
@@ -169,22 +245,27 @@ function renderResults() {
     return;
   }
 
-  visiblePhotos.forEach(({ file, category }) => {
+  visiblePhotos.forEach(({ file, category, matchedObjects }) => {
     const card = document.createElement("article");
     const placeholder = document.createElement("div");
     const placeholderText = document.createElement("span");
     const body = document.createElement("div");
     const name = document.createElement("strong");
     const label = document.createElement("p");
+    const reason = document.createElement("p");
 
     card.className = "photo-card";
     placeholder.className = "photo-placeholder";
     placeholderText.textContent = file.name;
     name.textContent = file.name;
     label.textContent = `分類: ${category}`;
+    reason.className = "detected-tags";
+    reason.textContent = matchedObjects.length > 0
+      ? `検出根拠: ${matchedObjects.map((object) => `${object.label}×${object.count}`).join("、")}`
+      : "検出根拠なし（信頼度不足）";
     placeholder.append(placeholderText);
     body.className = "photo-card-body";
-    body.append(name, label);
+    body.append(name, label, reason);
     card.append(placeholder, body);
     resultsGrid.append(card);
   });
