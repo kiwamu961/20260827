@@ -18,6 +18,7 @@ const CATEGORY_RULES = [
 const uploadView = document.getElementById("uploadView");
 const processingView = document.getElementById("processingView");
 const resultsView = document.getElementById("resultsView");
+const confirmationView = document.getElementById("confirmationView");
 const correctionView = document.getElementById("correctionView");
 const uploadForm = document.getElementById("uploadForm");
 const propertyIdInput = document.getElementById("propertyId");
@@ -37,9 +38,17 @@ const progressLabel = document.getElementById("progressLabel");
 const processingFiles = document.getElementById("processingFiles");
 const showResultsButton = document.getElementById("showResultsButton");
 const resultsProperty = document.getElementById("resultsProperty");
+const openConfirmationButton = document.getElementById("openConfirmationButton");
 const categoryTabs = document.getElementById("categoryTabs");
 const resultsGrid = document.getElementById("resultsGrid");
 const backToUploadButton = document.getElementById("backToUploadButton");
+const confirmationProperty = document.getElementById("confirmationProperty");
+const summaryProcessed = document.getElementById("summaryProcessed");
+const summaryClassified = document.getElementById("summaryClassified");
+const summaryUnclassified = document.getElementById("summaryUnclassified");
+const summaryCategories = document.getElementById("summaryCategories");
+const backToResultsButton = document.getElementById("backToResultsButton");
+const discardFromConfirmationButton = document.getElementById("discardFromConfirmationButton");
 const correctionProperty = document.getElementById("correctionProperty");
 const correctionPreviewImage = document.getElementById("correctionPreviewImage");
 const correctionFileName = document.getElementById("correctionFileName");
@@ -151,6 +160,7 @@ function switchView(view) {
   uploadView.hidden = view !== "upload";
   processingView.hidden = view !== "processing";
   resultsView.hidden = view !== "results";
+  confirmationView.hidden = view !== "confirmation";
   correctionView.hidden = view !== "correction";
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -249,6 +259,38 @@ function renderCategoryTabs() {
   });
 }
 
+function getResultSummary() {
+  const processed = classifiedPhotos.length;
+  const classified = classifiedPhotos.filter((photo) => !photo.failed && photo.category !== "未分類").length;
+  const unclassified = classifiedPhotos.filter((photo) => photo.failed || photo.category === "未分類").length;
+  const categoryCounts = CATEGORIES.filter((category) => category !== "すべて").map((category) => ({
+    category,
+    count: classifiedPhotos.filter((photo) => photo.category === category).length,
+  }));
+
+  return { processed, classified, unclassified, categoryCounts };
+}
+
+function renderConfirmation() {
+  const summary = getResultSummary();
+  confirmationProperty.textContent = `${propertyIdInput.value.trim()} / ${classifiedPhotos.length}枚`;
+  summaryProcessed.textContent = `${summary.processed}枚`;
+  summaryClassified.textContent = `${summary.classified}枚`;
+  summaryUnclassified.textContent = `${summary.unclassified}枚`;
+
+  summaryCategories.replaceChildren();
+  summary.categoryCounts.forEach(({ category, count }) => {
+    const item = document.createElement("div");
+    const name = document.createElement("span");
+    const value = document.createElement("strong");
+    item.className = "summary-category";
+    name.textContent = category;
+    value.textContent = `${count}枚`;
+    item.append(name, value);
+    summaryCategories.append(item);
+  });
+}
+
 function renderResults() {
   renderCategoryTabs();
   resultsGrid.replaceChildren();
@@ -328,6 +370,24 @@ function openCorrectionView(photo) {
   switchView("correction");
 }
 
+function openConfirmationView() {
+  renderConfirmation();
+  switchView("confirmation");
+}
+
+function discardResults() {
+  revokePhotoPreviews();
+  selectedFiles = [];
+  classifiedPhotos = [];
+  activeCategory = "すべて";
+  currentCorrectionPhoto = null;
+  propertyIdInput.value = "";
+  showError("");
+  statusMessage.hidden = true;
+  renderFiles();
+  switchView("upload");
+}
+
 photoInput.addEventListener("change", (event) => {
   addFiles(event.target.files);
   event.target.value = "";
@@ -383,6 +443,21 @@ showResultsButton.addEventListener("click", () => {
   switchView("results");
 });
 
+openConfirmationButton.addEventListener("click", () => {
+  renderResults();
+  openConfirmationView();
+});
+
+backToResultsButton.addEventListener("click", () => {
+  resultsProperty.textContent = `${propertyIdInput.value.trim()} / ${classifiedPhotos.length}枚`;
+  renderResults();
+  switchView("results");
+});
+
+discardFromConfirmationButton.addEventListener("click", () => {
+  discardResults();
+});
+
 correctionForm.addEventListener("submit", (event) => {
   event.preventDefault();
   if (!currentCorrectionPhoto) return;
@@ -402,13 +477,5 @@ cancelCorrectionButton.addEventListener("click", () => {
 });
 
 backToUploadButton.addEventListener("click", () => {
-  revokePhotoPreviews();
-  selectedFiles = [];
-  classifiedPhotos = [];
-  propertyIdInput.value = "";
-  currentCorrectionPhoto = null;
-  showError("");
-  statusMessage.hidden = true;
-  renderFiles();
-  switchView("upload");
+  discardResults();
 });

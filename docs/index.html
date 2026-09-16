@@ -87,10 +87,46 @@
         <h1>分類結果</h1>
         <p id="resultsProperty" class="workflow-subtitle"></p>
       </div>
-      <button id="backToUploadButton" class="secondary-button" type="button">新しい物件を分類</button>
+      <div class="results-actions">
+        <button id="openConfirmationButton" class="secondary-button" type="button">結果を確認</button>
+        <button id="backToUploadButton" class="secondary-button" type="button">新しい物件を分類</button>
+      </div>
     </div>
     <div id="categoryTabs" class="category-tabs" role="tablist" aria-label="写真カテゴリ"></div>
     <section id="resultsGrid" class="results-grid" aria-live="polite"></section>
+  </main>
+
+  <main class="confirmation-shell" id="confirmationView" hidden>
+    <section class="confirmation-card" aria-labelledby="confirmationTitle">
+      <div class="step-heading"><span class="step-number">06</span><span>RESULT CONFIRMATION</span></div>
+      <h1 id="confirmationTitle">処理結果確認</h1>
+      <p id="confirmationProperty" class="workflow-subtitle"></p>
+
+      <div class="summary-grid" aria-label="処理結果サマリー">
+        <article class="summary-item">
+          <span>処理済み枚数</span>
+          <strong id="summaryProcessed">0枚</strong>
+        </article>
+        <article class="summary-item">
+          <span>分類済み枚数</span>
+          <strong id="summaryClassified">0枚</strong>
+        </article>
+        <article class="summary-item">
+          <span>未分類枚数</span>
+          <strong id="summaryUnclassified">0枚</strong>
+        </article>
+      </div>
+
+      <div class="confirmation-section">
+        <h2>カテゴリ別内訳</h2>
+        <div id="summaryCategories" class="summary-categories"></div>
+      </div>
+
+      <div class="confirmation-actions">
+        <button id="backToResultsButton" class="secondary-button" type="button">分類結果へ戻る</button>
+        <button id="discardFromConfirmationButton" class="primary-button" type="button"><span>処理結果を破棄</span><span aria-hidden="true">→</span></button>
+      </div>
+    </section>
   </main>
 
   <main class="correction-shell" id="correctionView" hidden>
