@@ -1,3 +1,8 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.pt
+*.onnx
 # Dependencies
 node_modules/
 .pnpm-store/

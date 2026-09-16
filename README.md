@@ -14,6 +14,7 @@ YOLOで物件写真内の物体を検出し、JavaScriptで写真をカテゴリ
 | --- | --- |
 | [pj-docs/](pj-docs/) | 企画書・要件定義書・外部設計書などの開発資料 |
 | [docs/](docs/) | PhotoSortプロトタイプのGitHub Pages公開用ソース |
+| [backend/](backend/) | Ultralytics YOLO推論用のFastAPIローカルサーバー |
 
 > 通常、ソースコードは `src/` に置くことが多いですが、本レポジトリでは GitHub Pages の公開元フォルダとして `main` ブランチの `/docs` を指定できる仕様に合わせて、`docs/` をソースフォルダとして採用しています。
 
@@ -29,6 +30,36 @@ YOLOで物件写真内の物体を検出し、JavaScriptで写真をカテゴリ
 | [docs/images/](docs/images/) | 公開ページで使用する画像 |
 
 公開する場合は、リポジトリの Settings → Pages で Source を `main` ブランチ / `/docs` フォルダに設定してください。
+
+## YOLOローカル環境
+
+GitHub Pagesは静的ファイルを配信するため、実YOLO推論は実行できません。実画像で検出する場合は、Windows上でFastAPI推論サーバーと`docs/`をローカル起動します。Python 3.12を推奨します。
+
+### 初回セットアップ（PowerShell）
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r backend\requirements.txt
+```
+
+### 起動
+
+ターミナルを2つ使用します。
+
+```powershell
+# ターミナル1: YOLO API（初回推論時にモデルを取得）
+\.venv\Scripts\Activate.ps1
+python -m uvicorn backend.app:app --host 127.0.0.1 --port 8000
+```
+
+```powershell
+# ターミナル2: PhotoSort画面
+py -m http.server 5500 --directory docs
+```
+
+ブラウザーで`http://127.0.0.1:5500`を開きます。モデルを変更する場合は、起動前に`$env:YOLO_MODEL = "モデルファイル名.pt"`を設定してください。現在の画面はローカルFastAPIの`/api/infer`へ画像を送り、`yolo11n.pt`の検出結果をカテゴリ分類へ渡します。
 
 ## pj-docsについて
 
