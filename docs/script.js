@@ -18,6 +18,7 @@ const CATEGORY_RULES = [
 const uploadView = document.getElementById("uploadView");
 const processingView = document.getElementById("processingView");
 const resultsView = document.getElementById("resultsView");
+const correctionView = document.getElementById("correctionView");
 const uploadForm = document.getElementById("uploadForm");
 const propertyIdInput = document.getElementById("propertyId");
 const photoInput = document.getElementById("photoInput");
@@ -39,10 +40,19 @@ const resultsProperty = document.getElementById("resultsProperty");
 const categoryTabs = document.getElementById("categoryTabs");
 const resultsGrid = document.getElementById("resultsGrid");
 const backToUploadButton = document.getElementById("backToUploadButton");
+const correctionProperty = document.getElementById("correctionProperty");
+const correctionPreviewImage = document.getElementById("correctionPreviewImage");
+const correctionFileName = document.getElementById("correctionFileName");
+const correctionForm = document.getElementById("correctionForm");
+const currentCategoryLabel = document.getElementById("currentCategoryLabel");
+const correctionReason = document.getElementById("correctionReason");
+const correctionCategory = document.getElementById("correctionCategory");
+const cancelCorrectionButton = document.getElementById("cancelCorrectionButton");
 
 let selectedFiles = [];
 let classifiedPhotos = [];
 let activeCategory = "すべて";
+let currentCorrectionPhoto = null;
 
 function formatFileSize(bytes) {
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
@@ -80,6 +90,22 @@ function classifyDetections(detectedObjects) {
     }
   }
   return { category: "未分類", matchedObjects: [] };
+}
+
+function formatMatchedObjects(matchedObjects) {
+  return matchedObjects.map((object) => {
+    const name = object.label || object.name || "unknown";
+    const confidence = typeof object.confidence === "number" ? `(${Math.round(object.confidence * 100)}%)` : "";
+    return `${name}${confidence}`;
+  }).join("、");
+}
+
+function revokePhotoPreviews() {
+  classifiedPhotos.forEach((photo) => {
+    if (photo.previewUrl) {
+      URL.revokeObjectURL(photo.previewUrl);
+    }
+  });
 }
 
 function showError(message) {
@@ -125,6 +151,7 @@ function switchView(view) {
   uploadView.hidden = view !== "upload";
   processingView.hidden = view !== "processing";
   resultsView.hidden = view !== "results";
+  correctionView.hidden = view !== "correction";
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -144,6 +171,7 @@ function renderProcessingFiles() {
 }
 
 async function startProcessing() {
+  revokePhotoPreviews();
   const total = selectedFiles.length;
   processingProperty.textContent = `${propertyIdInput.value.trim()} / ${total}枚を処理中`;
   progressBar.style.width = "0%";
@@ -164,11 +192,20 @@ async function startProcessing() {
     try {
       const detectedObjects = await detectObjects(file);
       const { category, matchedObjects } = classifyDetections(detectedObjects);
-      photo = { file, category, detectedObjects, matchedObjects, corrected: false, failed: false };
+      photo = {
+        file,
+        previewUrl: URL.createObjectURL(file),
+        category,
+        detectedObjects,
+        matchedObjects,
+        corrected: false,
+        failed: false,
+      };
       if (row) row.querySelector(".file-state").textContent = "分類済み";
     } catch (error) {
       photo = {
         file,
+        previewUrl: URL.createObjectURL(file),
         category: "未分類",
         detectedObjects: [],
         matchedObjects: [],
@@ -230,56 +267,65 @@ function renderResults() {
   visiblePhotos.forEach((photo) => {
     const { file, category, matchedObjects } = photo;
     const card = document.createElement("article");
-    const placeholder = document.createElement("div");
-    const placeholderText = document.createElement("span");
+    const preview = document.createElement("img");
     const body = document.createElement("div");
     const name = document.createElement("strong");
     const label = document.createElement("p");
     const reason = document.createElement("p");
-    const editForm = document.createElement("form");
-    const categoryLabel = document.createElement("label");
-    const categorySelect = document.createElement("select");
-    const saveButton = document.createElement("button");
+    const actionRow = document.createElement("div");
+    const correctionButton = document.createElement("button");
+    const correctionBadge = document.createElement("span");
 
     card.className = "photo-card";
-    placeholder.className = "photo-placeholder";
-    placeholderText.textContent = file.name;
+    preview.className = "photo-preview";
+    preview.src = photo.previewUrl;
+    preview.alt = `${file.name} のプレビュー`;
     name.textContent = file.name;
     label.textContent = `分類: ${category}`;
     reason.className = "detected-tags";
     reason.textContent = matchedObjects.length > 0
-      ? `検出根拠: ${matchedObjects.map((object) => `${object.label}×${object.count || 1}`).join("、")}`
+      ? `検出根拠: ${formatMatchedObjects(matchedObjects)}`
       : photo.failed ? `推論失敗: ${photo.errorMessage}` : "検出根拠なし（信頼度不足）";
-    editForm.className = "photo-edit-form";
-    categoryLabel.textContent = "分類先";
-    categoryLabel.htmlFor = `category-${classifiedPhotos.indexOf(photo)}`;
-    categorySelect.id = categoryLabel.htmlFor;
-    categorySelect.name = "category";
-    CATEGORIES.filter((option) => option !== "すべて").forEach((option) => {
-      const selectOption = document.createElement("option");
-      selectOption.value = option;
-      selectOption.textContent = option;
-      selectOption.selected = option === category;
-      categorySelect.append(selectOption);
-    });
-    saveButton.className = "text-button save-category-button";
-    saveButton.type = "submit";
-    saveButton.textContent = "保存";
-    editForm.append(categoryLabel, categorySelect, saveButton);
-    editForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const nextCategory = categorySelect.value;
-      if (!CATEGORIES.includes(nextCategory) || nextCategory === "すべて") return;
-      photo.category = nextCategory;
-      photo.corrected = true;
-      renderResults();
-    });
-    placeholder.append(placeholderText);
+    correctionBadge.className = "correction-badge";
+    correctionBadge.textContent = photo.corrected ? "修正済み" : "自動分類";
+    correctionButton.className = "text-button save-category-button";
+    correctionButton.type = "button";
+    correctionButton.textContent = "手動修正";
+    correctionButton.addEventListener("click", () => openCorrectionView(photo));
+    actionRow.className = "photo-actions";
+    actionRow.append(correctionBadge, correctionButton);
     body.className = "photo-card-body";
-    body.append(name, label, reason, editForm);
-    card.append(placeholder, body);
+    body.append(name, label, reason, actionRow);
+    card.append(preview, body);
     resultsGrid.append(card);
   });
+}
+
+function populateCorrectionCategorySelect(category) {
+  correctionCategory.replaceChildren();
+  CATEGORIES.filter((option) => option !== "すべて").forEach((option) => {
+    const selectOption = document.createElement("option");
+    selectOption.value = option;
+    selectOption.textContent = option;
+    selectOption.selected = option === category;
+    correctionCategory.append(selectOption);
+  });
+}
+
+function openCorrectionView(photo) {
+  currentCorrectionPhoto = photo;
+  correctionProperty.textContent = `${propertyIdInput.value.trim()} / ${classifiedPhotos.length}枚`;
+  correctionPreviewImage.src = photo.previewUrl;
+  correctionPreviewImage.alt = `${photo.file.name} の修正対象プレビュー`;
+  correctionFileName.textContent = photo.file.name;
+  currentCategoryLabel.textContent = `${photo.category}${photo.corrected ? "（修正済み）" : ""}`;
+  correctionReason.textContent = photo.failed
+    ? `推論失敗: ${photo.errorMessage}`
+    : photo.matchedObjects.length > 0
+      ? `検出根拠: ${formatMatchedObjects(photo.matchedObjects)}`
+      : "検出根拠なし（信頼度不足）";
+  populateCorrectionCategorySelect(photo.category);
+  switchView("correction");
 }
 
 photoInput.addEventListener("change", (event) => {
@@ -317,6 +363,7 @@ propertyIdInput.addEventListener("input", () => {
 });
 
 clearButton.addEventListener("click", () => {
+  revokePhotoPreviews();
   selectedFiles = [];
   showError("");
   statusMessage.hidden = true;
@@ -336,10 +383,30 @@ showResultsButton.addEventListener("click", () => {
   switchView("results");
 });
 
+correctionForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (!currentCorrectionPhoto) return;
+  const nextCategory = correctionCategory.value;
+  if (!CATEGORIES.includes(nextCategory) || nextCategory === "すべて") return;
+  currentCorrectionPhoto.category = nextCategory;
+  currentCorrectionPhoto.corrected = true;
+  currentCorrectionPhoto = null;
+  resultsProperty.textContent = `${propertyIdInput.value.trim()} / ${classifiedPhotos.length}枚`;
+  renderResults();
+  switchView("results");
+});
+
+cancelCorrectionButton.addEventListener("click", () => {
+  currentCorrectionPhoto = null;
+  switchView("results");
+});
+
 backToUploadButton.addEventListener("click", () => {
+  revokePhotoPreviews();
   selectedFiles = [];
   classifiedPhotos = [];
   propertyIdInput.value = "";
+  currentCorrectionPhoto = null;
   showError("");
   statusMessage.hidden = true;
   renderFiles();

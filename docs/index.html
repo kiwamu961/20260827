@@ -93,6 +93,37 @@
     <section id="resultsGrid" class="results-grid" aria-live="polite"></section>
   </main>
 
+  <main class="correction-shell" id="correctionView" hidden>
+    <section class="correction-card" aria-labelledby="correctionTitle">
+      <div class="step-heading"><span class="step-number">04</span><span>MANUAL CORRECTION</span></div>
+      <h1 id="correctionTitle">手動修正</h1>
+      <p id="correctionProperty" class="workflow-subtitle"></p>
+
+      <div class="correction-layout">
+        <figure class="correction-preview">
+          <img id="correctionPreviewImage" alt="修正対象の写真プレビュー">
+          <figcaption id="correctionFileName"></figcaption>
+        </figure>
+
+        <form id="correctionForm" class="correction-form">
+          <div class="correction-summary">
+            <p>現在のカテゴリ</p>
+            <strong id="currentCategoryLabel"></strong>
+            <p id="correctionReason" class="detected-tags"></p>
+          </div>
+
+          <label class="field-label" for="correctionCategory">分類先</label>
+          <select id="correctionCategory" name="category"></select>
+
+          <div class="correction-actions">
+            <button id="cancelCorrectionButton" class="secondary-button" type="button">キャンセル</button>
+            <button class="primary-button" type="submit"><span>保存</span><span aria-hidden="true">→</span></button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
   <script src="script.js"></script>
 </body>
 </html>
