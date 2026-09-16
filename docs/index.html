@@ -3,37 +3,95 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hello World | GitHub Pages Sample</title>
-  <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+  <meta name="description" content="物件写真を分類するプロトタイプのアップロード画面">
+  <title>PhotoSort | 物件写真分類</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="hero">
-    <img src="images/hero.svg" alt="Hello World イラスト" class="hero-image">
-    <h1 id="greeting">Hello, Japan!</h1>
-    <p class="subtitle">GitHub Pages 動作確認用サンプルページ（docs/ フォルダから公開）</p>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="PhotoSort ホーム">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span>PhotoSort</span>
+    </a>
+    <span class="prototype-label">プロトタイプ</span>
   </header>
 
-  <main>
-    <section class="card">
-      <h2>挨拶を切り替えてみよう</h2>
-      <p id="output" class="output">ボタンを押すと世界の挨拶が表示されます。</p>
-      <button id="greetBtn" type="button">次の挨拶へ ➜</button>
+  <main class="page-shell" id="uploadView">
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow">PROPERTY PHOTO ORGANIZER</p>
+      <h1 id="page-title">物件写真を、<br><em>見たい場所ごとに。</em></h1>
+      <p class="intro-copy">写真をまとめてアップロードすると、浴室・トイレ・リビングなどのカテゴリへ自動で整理します。</p>
+      <div class="category-list" aria-label="分類カテゴリ">
+        <span>浴室</span><span>トイレ</span><span>リビング</span><span>玄関</span>
+        <span>キッチン</span><span>洗面所</span><span>バルコニー</span>
+      </div>
     </section>
 
-    <section class="card">
-      <h2>このサイトについて</h2>
-      <ul>
-        <li><code>docs/</code> フォルダを GitHub Pages の公開元（Source）として使用しています。</li>
-        <li>画像は <code>docs/images/</code> フォルダにまとめています。</li>
-        <li><code>script.js</code> による簡易的なインタラクションを実装しています。</li>
-      </ul>
+    <section class="upload-panel" aria-labelledby="upload-title">
+      <div class="panel-heading">
+        <div>
+          <p class="section-kicker">STEP 01</p>
+          <h2 id="upload-title">写真をアップロード</h2>
+        </div>
+        <span class="limit-badge">JPG / PNG・最大50枚</span>
+      </div>
+
+      <form id="uploadForm">
+        <label class="field-label" for="propertyId">物件識別子 <span>必須</span></label>
+        <input id="propertyId" name="propertyId" type="text" placeholder="例：SHINJUKU-203" autocomplete="off" required>
+
+        <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-controls="photoInput" aria-describedby="dropHint">
+          <input id="photoInput" name="photos" type="file" accept="image/jpeg,image/png" multiple>
+          <div class="upload-icon" aria-hidden="true">↑</div>
+          <h3>写真をここにドロップ</h3>
+          <p id="dropHint">または <label for="photoInput" class="browse-link">ファイルを選択</label></p>
+          <small>JPG・PNG形式 / 1回につき最大50枚</small>
+        </div>
+
+        <p id="errorMessage" class="message error" role="alert" hidden></p>
+        <div id="fileSummary" class="file-summary" aria-live="polite" hidden>
+          <div>
+            <strong id="fileCount">0枚</strong>
+            <span>選択されています</span>
+          </div>
+          <button id="clearButton" class="text-button" type="button">すべて解除</button>
+        </div>
+        <ul id="fileList" class="file-list" aria-label="選択した写真"></ul>
+
+        <button id="startButton" class="primary-button" type="submit" disabled>
+          <span>分類を開始</span><span aria-hidden="true">→</span>
+        </button>
+        <p id="statusMessage" class="message status" role="status" hidden></p>
+      </form>
+    </section>
+
+    <p class="privacy-note"><span aria-hidden="true">⌁</span> 写真はプロトタイプの処理確認にのみ使用します</p>
+  </main>
+
+  <main class="workflow-shell" id="processingView" hidden>
+    <section class="workflow-card" aria-labelledby="processingTitle">
+      <div class="step-heading"><span class="step-number">02</span><span>PROCESSING</span></div>
+      <h1 id="processingTitle">写真を整理しています</h1>
+      <p id="processingProperty" class="workflow-subtitle"></p>
+      <div class="progress-track" aria-hidden="true"><div id="progressBar" class="progress-bar"></div></div>
+      <div class="progress-meta"><strong id="progressCount">0 / 0枚</strong><span id="progressLabel">準備中</span></div>
+      <div id="processingFiles" class="processing-files" aria-live="polite"></div>
+      <button id="showResultsButton" class="primary-button" type="button" hidden><span>分類結果を見る</span><span aria-hidden="true">→</span></button>
     </section>
   </main>
 
-  <footer>
-    <p>&copy; 2026 TaskFlow Project</p>
-  </footer>
+  <main class="results-shell" id="resultsView" hidden>
+    <div class="results-header">
+      <div>
+        <div class="step-heading"><span class="step-number">03</span><span>CLASSIFIED PHOTOS</span></div>
+        <h1>分類結果</h1>
+        <p id="resultsProperty" class="workflow-subtitle"></p>
+      </div>
+      <button id="backToUploadButton" class="secondary-button" type="button">新しい物件を分類</button>
+    </div>
+    <div id="categoryTabs" class="category-tabs" role="tablist" aria-label="写真カテゴリ"></div>
+    <section id="resultsGrid" class="results-grid" aria-live="polite"></section>
+  </main>
 
   <script src="script.js"></script>
 </body>
