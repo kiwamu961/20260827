@@ -1,7 +1,10 @@
-const MAX_FILES = 50;
 const ACCEPTED_TYPES = new Set(["image/jpeg", "image/png"]);
 const CATEGORIES = ["すべて", "浴室", "トイレ", "リビング", "玄関", "キッチン", "洗面所", "バルコニー", "未分類"];
 const YOLO_API_BASE_URL = "http://127.0.0.1:8000";
+const PLANS = {
+  normal: { label: "Normal", maxFiles: 50 },
+  pro: { label: "Pro", maxFiles: 100 },
+};
 
 // カテゴリ判定ルール。対象カテゴリに属する異なる検出クラスが
 // minDistinctObjects（N種類）以上そろった最初のカテゴリを採用する。
@@ -42,6 +45,9 @@ const openConfirmationButton = document.getElementById("openConfirmationButton")
 const categoryTabs = document.getElementById("categoryTabs");
 const resultsGrid = document.getElementById("resultsGrid");
 const backToUploadButton = document.getElementById("backToUploadButton");
+const planTabs = document.querySelectorAll(".plan-tab");
+const limitBadge = document.getElementById("limitBadge");
+const uploadLimitHint = document.getElementById("uploadLimitHint");
 const confirmationProperty = document.getElementById("confirmationProperty");
 const summaryProcessed = document.getElementById("summaryProcessed");
 const summaryClassified = document.getElementById("summaryClassified");
@@ -62,6 +68,37 @@ let selectedFiles = [];
 let classifiedPhotos = [];
 let activeCategory = "すべて";
 let currentCorrectionPhoto = null;
+let activePlan = "normal";
+
+function getActivePlan() {
+  return PLANS[activePlan];
+}
+
+function renderPlan() {
+  const plan = getActivePlan();
+  planTabs.forEach((tab) => {
+    const isActive = tab.dataset.plan === activePlan;
+    tab.classList.toggle("is-active", isActive);
+    tab.setAttribute("aria-selected", String(isActive));
+  });
+  limitBadge.textContent = `${plan.label} / JPG・PNG・最大${plan.maxFiles}枚`;
+  uploadLimitHint.textContent = `JPG・PNG形式 / 1回につき最大${plan.maxFiles}枚`;
+}
+
+planTabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    activePlan = tab.dataset.plan;
+    const maxFiles = getActivePlan().maxFiles;
+    if (selectedFiles.length > maxFiles) {
+      selectedFiles = selectedFiles.slice(0, maxFiles);
+      showError(`${getActivePlan().label}でアップロードできる写真は最大${maxFiles}枚です。`);
+    }
+    renderPlan();
+    renderFiles();
+  });
+});
+
+renderPlan();
 
 function formatFileSize(bytes) {
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
@@ -147,9 +184,10 @@ function addFiles(fileListLike) {
 
   showError(invalidFiles.length > 0 ? "JPGまたはPNG形式の写真だけを選択してください。" : "");
   const mergedFiles = [...selectedFiles, ...validFiles];
-  if (mergedFiles.length > MAX_FILES) {
-    showError(`アップロードできる写真は最大${MAX_FILES}枚です。`);
-    selectedFiles = mergedFiles.slice(0, MAX_FILES);
+  const maxFiles = getActivePlan().maxFiles;
+  if (mergedFiles.length > maxFiles) {
+    showError(`${getActivePlan().label}でアップロードできる写真は最大${maxFiles}枚です。`);
+    selectedFiles = mergedFiles.slice(0, maxFiles);
   } else {
     selectedFiles = mergedFiles;
   }

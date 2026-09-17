@@ -38,6 +38,12 @@ body::before {
   padding: 26px 32px;
 }
 
+.header-tools { display: flex; align-items: center; gap: 14px; }
+.plan-switch { display: inline-flex; padding: 3px; background: rgba(255, 255, 255, .78); border: 1px solid var(--line); border-radius: 7px; }
+.plan-tab { padding: 7px 11px; color: var(--muted); background: transparent; border: 0; border-radius: 4px; font: inherit; font-size: 11px; font-weight: 800; cursor: pointer; }
+.plan-tab:hover { color: var(--accent-dark); }
+.plan-tab.is-active { color: white; background: var(--ink); }
+
 .brand {
   display: inline-flex;
   align-items: center;
@@ -143,6 +149,8 @@ input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rg
 
 @media (max-width: 760px) {
   .site-header { padding: 20px; }
+  .header-tools { gap: 8px; }
+  .prototype-label { display: none; }
   .page-shell { display: block; min-height: auto; padding: 35px 20px 45px; }
   .intro { margin-bottom: 38px; }
   .intro h1 { font-size: clamp(40px, 13vw, 56px); }

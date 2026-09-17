@@ -13,7 +13,13 @@
       <span class="brand-mark" aria-hidden="true">P</span>
       <span>PhotoSort</span>
     </a>
-    <span class="prototype-label">プロトタイプ</span>
+    <div class="header-tools">
+      <div class="plan-switch" role="tablist" aria-label="利用プラン">
+        <button class="plan-tab is-active" type="button" role="tab" aria-selected="true" data-plan="normal">Normal</button>
+        <button class="plan-tab" type="button" role="tab" aria-selected="false" data-plan="pro">Pro</button>
+      </div>
+      <span class="prototype-label">プロトタイプ</span>
+    </div>
   </header>
 
   <main class="page-shell" id="uploadView">
@@ -33,7 +39,7 @@
           <p class="section-kicker">STEP 01</p>
           <h2 id="upload-title">写真をアップロード</h2>
         </div>
-        <span class="limit-badge">JPG / PNG・最大50枚</span>
+        <span id="limitBadge" class="limit-badge">Normal / JPG・PNG・最大50枚</span>
       </div>
 
       <form id="uploadForm">
@@ -45,7 +51,7 @@
           <div class="upload-icon" aria-hidden="true">↑</div>
           <h3>写真をここにドロップ</h3>
           <p id="dropHint">または <label for="photoInput" class="browse-link">ファイルを選択</label></p>
-          <small>JPG・PNG形式 / 1回につき最大50枚</small>
+          <small id="uploadLimitHint">JPG・PNG形式 / 1回につき最大50枚</small>
         </div>
 
         <p id="errorMessage" class="message error" role="alert" hidden></p>
