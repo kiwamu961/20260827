@@ -77,6 +77,7 @@ function getActivePlan() {
 
 function renderPlan() {
   const plan = getActivePlan();
+  planSwitch.classList.toggle("is-pro", activePlan === "pro");
   planTabs.forEach((tab) => {
     const isActive = tab.dataset.plan === activePlan;
     tab.classList.toggle("is-active", isActive);
