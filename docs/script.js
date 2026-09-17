@@ -390,7 +390,11 @@ function renderResults() {
     reason.className = "detected-tags";
     reason.textContent = matchedObjects.length > 0
       ? `検出根拠: ${formatMatchedObjects(matchedObjects)}`
-      : photo.failed ? `推論失敗: ${photo.errorMessage}` : "検出根拠なし（信頼度不足）";
+      : photo.failed
+        ? `推論失敗: ${photo.errorMessage}`
+        : photo.detectedObjects.length > 0
+          ? `検出物: ${formatMatchedObjects(photo.detectedObjects)}（分類ルール未対応）`
+          : "検出物なし（YOLOが対象物を検出できませんでした）";
     correctionBadge.className = "correction-badge";
     correctionBadge.textContent = photo.corrected ? "修正済み" : "自動分類";
     correctionButton.className = "text-button save-category-button";
@@ -428,7 +432,9 @@ function openCorrectionView(photo) {
     ? `推論失敗: ${photo.errorMessage}`
     : photo.matchedObjects.length > 0
       ? `検出根拠: ${formatMatchedObjects(photo.matchedObjects)}`
-      : "検出根拠なし（信頼度不足）";
+      : photo.detectedObjects.length > 0
+        ? `検出物: ${formatMatchedObjects(photo.detectedObjects)}（分類ルール未対応）`
+        : "検出物なし（YOLOが対象物を検出できませんでした）";
   populateCorrectionCategorySelect(photo.category);
   switchView("correction");
 }
