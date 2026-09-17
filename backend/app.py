@@ -52,9 +52,10 @@ app.add_middleware(
 )
 
 
-def validate_image(content: bytes, content_type: str | None) -> Image.Image:
-    if content_type not in ALLOWED_CONTENT_TYPES:
-        raise HTTPException(status_code=400, detail="JPGまたはPNG形式の画像だけを受け付けます。")
+def validate_image(content: bytes, content_type: str | None, filename: str | None) -> Image.Image:
+    extension = os.path.splitext(filename or "")[1].lower()
+    if content_type not in ALLOWED_CONTENT_TYPES and extension not in {".jpg", ".jpeg", ".png"}:
+        raise HTTPException(status_code=400, detail="JPEG、JPGまたはPNG形式の画像だけを受け付けます。")
     if len(content) > MAX_FILE_SIZE:
         raise HTTPException(status_code=413, detail="画像サイズは10MB以下にしてください。")
     try:
@@ -100,7 +101,7 @@ async def infer(file: UploadFile = File(...)) -> dict[str, Any]:
     if model is None:
         raise HTTPException(status_code=503, detail="YOLOモデルを読み込めていません。")
     content = await file.read()
-    image = validate_image(content, file.content_type)
+    image = validate_image(content, file.content_type, file.filename)
     try:
         result = model.predict(source=image, verbose=False)[0]
     except Exception as error:

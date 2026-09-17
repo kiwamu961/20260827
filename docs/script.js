@@ -1,4 +1,5 @@
 const ACCEPTED_TYPES = new Set(["image/jpeg", "image/png"]);
+const ACCEPTED_EXTENSIONS = new Set([".jpg", ".jpeg", ".png"]);
 const CATEGORIES = ["すべて", "浴室", "トイレ", "リビング", "玄関", "キッチン", "洗面所", "バルコニー", "未分類"];
 const YOLO_API_BASE_URL = "http://127.0.0.1:8000";
 const PLANS = {
@@ -84,8 +85,8 @@ function renderPlan() {
     tab.classList.toggle("is-active", isActive);
     tab.setAttribute("aria-selected", String(isActive));
   });
-  limitBadge.textContent = `${plan.label} / JPG・PNG・最大${plan.maxFiles}枚`;
-  uploadLimitHint.textContent = `JPG・PNG形式 / 1回につき最大${plan.maxFiles}枚`;
+  limitBadge.textContent = `${plan.label} / JPEG・JPG・PNG・最大${plan.maxFiles}枚`;
+  uploadLimitHint.textContent = `JPEG・JPG・PNG形式 / 1回につき最大${plan.maxFiles}枚`;
 }
 
 planSwitch.addEventListener("click", (event) => {
@@ -183,10 +184,14 @@ function renderFiles() {
 
 function addFiles(fileListLike) {
   const incomingFiles = Array.from(fileListLike);
-  const invalidFiles = incomingFiles.filter((file) => !ACCEPTED_TYPES.has(file.type));
-  const validFiles = incomingFiles.filter((file) => ACCEPTED_TYPES.has(file.type));
+  const isAcceptedFile = (file) => {
+    const extension = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
+    return ACCEPTED_TYPES.has(file.type) || ACCEPTED_EXTENSIONS.has(extension);
+  };
+  const invalidFiles = incomingFiles.filter((file) => !isAcceptedFile(file));
+  const validFiles = incomingFiles.filter(isAcceptedFile);
 
-  showError(invalidFiles.length > 0 ? "JPGまたはPNG形式の写真だけを選択してください。" : "");
+  showError(invalidFiles.length > 0 ? "JPEG、JPGまたはPNG形式の写真だけを選択してください。" : "");
   const mergedFiles = [...selectedFiles, ...validFiles];
   const maxFiles = getActivePlan().maxFiles;
   if (mergedFiles.length > maxFiles) {

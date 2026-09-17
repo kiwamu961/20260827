@@ -40,7 +40,7 @@
           <p class="section-kicker">STEP 01</p>
           <h2 id="upload-title">写真をアップロード</h2>
         </div>
-        <span id="limitBadge" class="limit-badge">Normal / JPG・PNG・最大50枚</span>
+        <span id="limitBadge" class="limit-badge">Normal / JPEG・JPG・PNG・最大50枚</span>
       </div>
 
       <form id="uploadForm">
@@ -48,8 +48,8 @@
         <input id="propertyId" name="propertyId" type="text" placeholder="例：SHINJUKU-203" autocomplete="off" required>
 
         <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-controls="photoInput folderInput" aria-describedby="dropHint">
-          <input id="photoInput" name="photos" type="file" accept="image/jpeg,image/png" multiple>
-          <input id="folderInput" name="photoFolder" type="file" accept="image/jpeg,image/png" webkitdirectory directory multiple>
+          <input id="photoInput" name="photos" type="file" accept="image/jpeg,.jpg,.jpeg,image/png,.png" multiple>
+          <input id="folderInput" name="photoFolder" type="file" accept="image/jpeg,.jpg,.jpeg,image/png,.png" webkitdirectory directory multiple>
           <div class="upload-icon" aria-hidden="true">↑</div>
           <h3>写真をここにドロップ</h3>
           <p id="dropHint">または</p>
@@ -58,7 +58,7 @@
             <span aria-hidden="true">または</span>
             <label for="folderInput" class="browse-link folder-link">フォルダを選択</label>
           </div>
-          <small id="uploadLimitHint">JPG・PNG形式 / 1回につき最大50枚</small>
+          <small id="uploadLimitHint">JPEG・JPG・PNG形式 / 1回につき最大50枚</small>
         </div>
 
         <p id="errorMessage" class="message error" role="alert" hidden></p>
