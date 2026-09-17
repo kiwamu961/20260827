@@ -24,16 +24,29 @@ body {
 
 body::before {
   position: fixed;
-  top: -62vw;
+  top: -52vw;
   left: 50%;
   z-index: -1;
-  width: 124vw;
-  height: 124vw;
+  width: 130vw;
+  height: 130vw;
   content: "";
-  border: 1px solid rgba(52, 83, 70, .16);
+  border: 2px solid rgba(52, 83, 70, .2);
   border-radius: 50%;
-  box-shadow: 0 0 0 18px rgba(198, 158, 111, .035), 0 0 0 38px rgba(52, 83, 70, .07), 0 0 0 56px rgba(198, 158, 111, .025);
+  box-shadow: 0 0 0 14px rgba(198, 158, 111, .08), 0 0 0 32px rgba(52, 83, 70, .11), 0 0 0 48px rgba(198, 158, 111, .06), 0 0 0 82px rgba(52, 83, 70, .06);
   transform: translateX(-50%);
+}
+
+body::after {
+  position: fixed;
+  right: -34vw;
+  bottom: -72vw;
+  z-index: -1;
+  width: 92vw;
+  height: 92vw;
+  content: "";
+  border: 2px solid rgba(198, 158, 111, .14);
+  border-radius: 50%;
+  box-shadow: 0 0 0 22px rgba(52, 83, 70, .06), 0 0 0 45px rgba(198, 158, 111, .045);
 }
 
 .site-header {
