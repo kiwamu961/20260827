@@ -15,6 +15,8 @@ footer: 'PhotoSort / 2026'
 2026/09/17
 対象: PhotoSort プロトタイプ
 
+関連資料: [企画書](../01_proposal/proposal.md)、[企画概要書（サマリー）](../01_proposal/overview.md)、[要件定義書](../02_requirements/requirements.md)
+
 ---
 
 # 1. レビューの目的
@@ -220,7 +222,7 @@ PhotoSortは、物件写真をAIで分析し、顧客が確認したい空間カ
 # 12. 参照資料
 
 - [企画書](../01_proposal/proposal.md)
-- [企画概要書](../01_proposal/overview.md)
+- [企画概要書（サマリー）](../01_proposal/overview.md)
 - [要件定義書](../02_requirements/requirements.md)
 - [外部設計書](../04_external-design/external-design.md)
 - [内部設計書](../05_internal-design/internal-design.md)
