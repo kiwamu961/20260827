@@ -7,16 +7,16 @@ const PLANS = {
   pro: { label: "Pro", maxFiles: 100 },
 };
 
-// カテゴリ判定ルール。対象カテゴリに属する異なる検出クラスが
-// minDistinctObjects（N種類）以上そろった最初のカテゴリを採用する。
+// 複数要素の組み合わせを優先し、単独でもカテゴリ固有性が高い検出は
+// 信頼度を確認して分類する。
 const CATEGORY_RULES = [
-  { category: "キッチン", objects: ["oven", "microwave", "refrigerator", "toaster"], minDistinctObjects: 2 },
-  { category: "浴室", objects: ["toothbrush", "hair drier"], minDistinctObjects: 2 },
-  { category: "トイレ", objects: ["toilet"], minDistinctObjects: 1 },
-  { category: "洗面所", objects: ["sink", "toothbrush", "hair drier"], minDistinctObjects: 2 },
-  { category: "リビング", objects: ["couch", "tv", "dining table", "bed"], minDistinctObjects: 2 },
-  { category: "玄関", objects: ["backpack", "umbrella"], minDistinctObjects: 2 },
-  { category: "バルコニー", objects: ["potted plant", "bench"], minDistinctObjects: 2 },
+  { category: "キッチン", objects: ["oven", "microwave", "refrigerator", "toaster"], minDistinctObjects: 2, singleObjectConfidence: 0.72 },
+  { category: "浴室", objects: ["toothbrush", "hair drier"], minDistinctObjects: 2, singleObjectConfidence: 0.8 },
+  { category: "トイレ", objects: ["toilet"], minDistinctObjects: 1, singleObjectConfidence: 0.55 },
+  { category: "洗面所", objects: ["sink", "toothbrush", "hair drier"], minDistinctObjects: 2, singleObjectConfidence: 0.78 },
+  { category: "リビング", objects: ["couch", "tv", "dining table", "bed"], minDistinctObjects: 2, singleObjectConfidence: 0.7 },
+  { category: "玄関", objects: ["backpack", "umbrella"], minDistinctObjects: 2, singleObjectConfidence: 0.82 },
+  { category: "バルコニー", objects: ["potted plant", "bench"], minDistinctObjects: 2, singleObjectConfidence: 0.8 },
 ];
 
 const uploadView = document.getElementById("uploadView");
@@ -133,12 +133,26 @@ async function detectObjects(file) {
 
 // 同じ物体が複数検出されても、異なる検出クラスの組み合わせを優先する。
 function classifyDetections(detectedObjects) {
+  const candidates = [];
   for (const rule of CATEGORY_RULES) {
     const matchedObjects = detectedObjects.filter((object) => rule.objects.includes(object.name));
     const distinctObjectNames = new Set(matchedObjects.map((object) => object.name));
-    if (distinctObjectNames.size >= rule.minDistinctObjects) {
-      return { category: rule.category, matchedObjects };
+    if (distinctObjectNames.size === 0) continue;
+    const confidenceTotal = matchedObjects.reduce((sum, object) => sum + (object.confidence || 0), 0);
+    const averageConfidence = confidenceTotal / matchedObjects.length;
+    const isCombination = distinctObjectNames.size >= rule.minDistinctObjects;
+    const isReliableSingle = distinctObjectNames.size === 1 && averageConfidence >= rule.singleObjectConfidence;
+    if (isCombination || isReliableSingle) {
+      candidates.push({
+        category: rule.category,
+        matchedObjects,
+        score: confidenceTotal + (isCombination ? 1 : 0),
+      });
     }
+  }
+  if (candidates.length > 0) {
+    candidates.sort((left, right) => right.score - left.score);
+    return candidates[0];
   }
   return { category: "未分類", matchedObjects: [] };
 }
