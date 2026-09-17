@@ -19,6 +19,7 @@ Webサービス開発プロジェクトを想定した開発資料一式のテ�
 | [08_comprehensive-testing](08_comprehensive-testing/) | 総合テスト計画書、テストチェックリスト | Markdown |
 | [09_shipment-approval](09_shipment-approval/) | 出荷判定資料、出荷物一覧、リリース計画書 | Markdown |
 | [10_post-release-retrospective](10_post-release-retrospective/) | リリース後振り返り | Markdown |
+| [11](11/) | 開発途中プロトタイプ画面記録 | Markdown・JPEG |
 
 > フォルダ名・ファイル名はOS依存の文字化けや文字コード事故を避けるため英語表記としています。文書内の記述は日本語のままです。
 

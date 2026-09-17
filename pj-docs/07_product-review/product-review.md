@@ -137,6 +137,16 @@ PhotoSortは、物件写真をAIで分析し、顧客が確認したい空間カ
 
 ---
 
+# 開発途中の画面記録
+
+![width:760px](../11/0917_1.jpeg)
+
+開発途中のPhotoSortアップロード画面では、Normal（1回50枚）とPro（1回100枚）のプラン切替、およびプロトタイプ表示まで確認した。物件識別子の入力、写真・フォルダ選択、7カテゴリの表示も確認できる。
+
+> 本画面は開発途中の確認用プロトタイプであり、最終成果範囲には含めない。料金計算、契約管理、プラン変更処理は対象外とする。
+
+---
+
 ## 画面・操作
 
 - 入力: 物件識別子、写真単体・複数ファイル・フォルダ、ドラッグ&ドロップに対応
@@ -286,6 +296,7 @@ PhotoSortは、物件写真をAIで分析し、顧客が確認したい空間カ
 - [要件定義書](../02_requirements/requirements.md)
 - [外部設計書](../04_external-design/external-design.md)
 - [内部設計書](../05_internal-design/internal-design.md)
+- [開発途中プロトタイプ画面記録](../11/prototype-screenshots.md)
 - [総合テスト計画書](../08_comprehensive-testing/test-plan.md)
 - [テストチェックリスト](../08_comprehensive-testing/test-checklist.md)
 
