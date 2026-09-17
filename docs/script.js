@@ -46,6 +46,7 @@ const categoryTabs = document.getElementById("categoryTabs");
 const resultsGrid = document.getElementById("resultsGrid");
 const backToUploadButton = document.getElementById("backToUploadButton");
 const planTabs = document.querySelectorAll(".plan-tab");
+const planSwitch = document.querySelector(".plan-switch");
 const limitBadge = document.getElementById("limitBadge");
 const uploadLimitHint = document.getElementById("uploadLimitHint");
 const confirmationProperty = document.getElementById("confirmationProperty");
@@ -85,9 +86,11 @@ function renderPlan() {
   uploadLimitHint.textContent = `JPG・PNG形式 / 1回につき最大${plan.maxFiles}枚`;
 }
 
-planTabs.forEach((tab) => {
-  tab.addEventListener("click", () => {
-    activePlan = tab.dataset.plan;
+planSwitch.addEventListener("click", (event) => {
+  const tab = event.target.closest(".plan-tab");
+  if (!tab) return;
+  activePlan = tab.dataset.plan;
+  if (!PLANS[activePlan]) return;
     const maxFiles = getActivePlan().maxFiles;
     if (selectedFiles.length > maxFiles) {
       selectedFiles = selectedFiles.slice(0, maxFiles);
@@ -95,7 +98,6 @@ planTabs.forEach((tab) => {
     }
     renderPlan();
     renderFiles();
-  });
 });
 
 renderPlan();
