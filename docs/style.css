@@ -16,20 +16,13 @@
 body {
   margin: 0;
   color: var(--ink);
-  background: var(--paper);
+  background: #e7edeb;
   font-family: "Aptos", "Yu Gothic", "Hiragino Kaku Gothic ProN", sans-serif;
   min-width: 320px;
 }
 
 body::before {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  content: "";
-  background-color: #edf2ee;
-  background-image: linear-gradient(rgba(52, 83, 70, .045) 1px, transparent 1px), linear-gradient(90deg, rgba(52, 83, 70, .045) 1px, transparent 1px);
-  background-size: 44px 44px;
-  opacity: .9;
+  display: none;
 }
 
 .site-header {
