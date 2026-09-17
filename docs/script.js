@@ -43,6 +43,7 @@ const progressLabel = document.getElementById("progressLabel");
 const processingFiles = document.getElementById("processingFiles");
 const showResultsButton = document.getElementById("showResultsButton");
 const resultsProperty = document.getElementById("resultsProperty");
+const openManualCorrectionButton = document.getElementById("openManualCorrectionButton");
 const openConfirmationButton = document.getElementById("openConfirmationButton");
 const categoryTabs = document.getElementById("categoryTabs");
 const resultsGrid = document.getElementById("resultsGrid");
@@ -431,6 +432,11 @@ function openCorrectionView(photo) {
   switchView("correction");
 }
 
+function openNextCorrectionView() {
+  const nextPhoto = classifiedPhotos.find((photo) => !photo.corrected) || classifiedPhotos[0];
+  if (nextPhoto) openCorrectionView(nextPhoto);
+}
+
 function openConfirmationView() {
   renderConfirmation();
   switchView("confirmation");
@@ -507,6 +513,10 @@ showResultsButton.addEventListener("click", () => {
   activeCategory = "すべて";
   renderResults();
   switchView("results");
+});
+
+openManualCorrectionButton.addEventListener("click", () => {
+  openNextCorrectionView();
 });
 
 openConfirmationButton.addEventListener("click", () => {

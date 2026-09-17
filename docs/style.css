@@ -263,6 +263,7 @@ input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rg
 .results-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 25px; margin-bottom: 32px; }
 .results-header h1 { margin-bottom: 7px; }
 .results-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.results-actions .primary-button { width: auto; margin-top: 0; padding: 11px 14px; font-size: 12px; }
 .secondary-button { padding: 11px 14px; color: var(--ink); background: white; border: 1px solid var(--line); border-radius: 5px; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
 .secondary-button:hover { border-color: var(--accent); color: var(--accent-dark); }
 .category-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
