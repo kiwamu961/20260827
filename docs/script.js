@@ -10,13 +10,13 @@ const PLANS = {
 // 複数要素の組み合わせを優先し、単独でもカテゴリ固有性が高い検出は
 // 信頼度を確認して分類する。
 const CATEGORY_RULES = [
-  { category: "キッチン", objects: ["oven", "microwave", "refrigerator", "toaster"], minDistinctObjects: 2, singleObjectConfidence: 0.72 },
-  { category: "浴室", objects: ["toothbrush", "hair drier"], minDistinctObjects: 2, singleObjectConfidence: 0.8 },
+  { category: "キッチン", objects: ["oven", "microwave", "refrigerator", "toaster"], minDistinctObjects: 1, singleObjectConfidence: 0.65 },
+  { category: "浴室", objects: ["toothbrush", "hair drier"], minDistinctObjects: 1, singleObjectConfidence: 0.65 },
   { category: "トイレ", objects: ["toilet"], minDistinctObjects: 1, singleObjectConfidence: 0.55 },
-  { category: "洗面所", objects: ["sink", "toothbrush", "hair drier"], minDistinctObjects: 2, singleObjectConfidence: 0.78 },
-  { category: "リビング", objects: ["couch", "tv", "dining table", "bed"], minDistinctObjects: 2, singleObjectConfidence: 0.7 },
-  { category: "玄関", objects: ["backpack", "umbrella"], minDistinctObjects: 2, singleObjectConfidence: 0.82 },
-  { category: "バルコニー", objects: ["potted plant", "bench"], minDistinctObjects: 2, singleObjectConfidence: 0.8 },
+  { category: "洗面所", objects: ["sink", "toothbrush", "hair drier"], minDistinctObjects: 1, singleObjectConfidence: 0.65 },
+  { category: "リビング", objects: ["couch", "tv", "dining table", "bed"], minDistinctObjects: 1, singleObjectConfidence: 0.65 },
+  { category: "玄関", objects: ["backpack", "umbrella"], minDistinctObjects: 1, singleObjectConfidence: 0.65 },
+  { category: "バルコニー", objects: ["potted plant", "bench"], minDistinctObjects: 1, singleObjectConfidence: 0.65 },
 ];
 
 const uploadView = document.getElementById("uploadView");
@@ -141,7 +141,8 @@ function classifyDetections(detectedObjects) {
     if (distinctObjectNames.size === 0) continue;
     const confidenceTotal = matchedObjects.reduce((sum, object) => sum + (object.confidence || 0), 0);
     const averageConfidence = confidenceTotal / matchedObjects.length;
-    const isCombination = distinctObjectNames.size >= rule.minDistinctObjects;
+    const isCombination = distinctObjectNames.size >= 2
+      && distinctObjectNames.size >= rule.minDistinctObjects;
     const isReliableSingle = distinctObjectNames.size === 1 && averageConfidence >= rule.singleObjectConfidence;
     if (isCombination || isReliableSingle) {
       candidates.push({
