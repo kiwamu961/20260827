@@ -26,7 +26,7 @@ YOLOで物件写真内の物体を検出し、JavaScriptで写真をカテゴリ
 | --- | --- |
 | [docs/index.html](docs/index.html) | アップロード・処理状況・分類結果の画面 |
 | [docs/style.css](docs/style.css) | PhotoSortの画面スタイル |
-| [docs/script.js](docs/script.js) | ファイル選択、疑似処理、カテゴリ表示の操作ロジック |
+| [docs/script.js](docs/script.js) | ファイル選択、ローカル推論API連携、カテゴリ表示の操作ロジック |
 | [docs/images/](docs/images/) | 公開ページで使用する画像 |
 
 公開する場合は、リポジトリの Settings → Pages で Source を `main` ブランチ / `/docs` フォルダに設定してください。
