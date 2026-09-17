@@ -10,13 +10,13 @@ const PLANS = {
 // 複数要素の組み合わせを優先し、単独でもカテゴリ固有性が高い検出は
 // 信頼度を確認して分類する。
 const CATEGORY_RULES = [
-  { category: "キッチン", objects: ["oven", "microwave", "refrigerator", "toaster"], minDistinctObjects: 1, singleObjectConfidence: 0.65 },
-  { category: "浴室", objects: ["toothbrush", "hair drier"], minDistinctObjects: 1, singleObjectConfidence: 0.65 },
-  { category: "トイレ", objects: ["toilet"], minDistinctObjects: 1, singleObjectConfidence: 0.55 },
-  { category: "洗面所", objects: ["sink", "toothbrush", "hair drier"], minDistinctObjects: 1, singleObjectConfidence: 0.65 },
-  { category: "リビング", objects: ["couch", "tv", "dining table", "bed"], minDistinctObjects: 1, singleObjectConfidence: 0.65 },
-  { category: "玄関", objects: ["backpack", "umbrella"], minDistinctObjects: 1, singleObjectConfidence: 0.65 },
-  { category: "バルコニー", objects: ["potted plant", "bench"], minDistinctObjects: 1, singleObjectConfidence: 0.65 },
+  { category: "キッチン", objects: ["oven", "microwave", "refrigerator", "toaster", "bottle", "cup", "bowl", "fork", "knife", "spoon", "wine glass"], minDistinctObjects: 1, singleObjectConfidence: 0.3 },
+  { category: "浴室", objects: ["bottle", "towel", "hair drier", "toothbrush", "soap"], minDistinctObjects: 1, singleObjectConfidence: 0.3 },
+  { category: "トイレ", objects: ["toilet", "sink", "toothbrush", "bottle"], minDistinctObjects: 1, singleObjectConfidence: 0.3 },
+  { category: "洗面所", objects: ["sink", "toothbrush", "hair drier", "bottle"], minDistinctObjects: 1, singleObjectConfidence: 0.3 },
+  { category: "リビング", objects: ["couch", "tv", "dining table", "bed", "chair", "book", "remote", "vase", "potted plant"], minDistinctObjects: 1, singleObjectConfidence: 0.3 },
+  { category: "玄関", objects: ["backpack", "umbrella", "handbag", "suitcase", "tie", "shoe"], minDistinctObjects: 1, singleObjectConfidence: 0.3 },
+  { category: "バルコニー", objects: ["potted plant", "bench", "chair", "bicycle", "umbrella"], minDistinctObjects: 1, singleObjectConfidence: 0.3 },
 ];
 
 const uploadView = document.getElementById("uploadView");

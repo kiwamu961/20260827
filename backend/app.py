@@ -103,7 +103,7 @@ async def infer(file: UploadFile = File(...)) -> dict[str, Any]:
     content = await file.read()
     image = validate_image(content, file.content_type, file.filename)
     try:
-        result = model.predict(source=image, verbose=False)[0]
+        result = model.predict(source=image, conf=0.1, verbose=False)[0]
     except Exception as error:
         raise HTTPException(status_code=500, detail="画像の推論に失敗しました。") from error
     return {
