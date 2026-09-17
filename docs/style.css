@@ -14,15 +14,26 @@
 * { box-sizing: border-box; }
 
 body {
+  position: relative;
   margin: 0;
   color: var(--ink);
-  background: #e7edeb;
+  background: #e9eeeb;
   font-family: "Aptos", "Yu Gothic", "Hiragino Kaku Gothic ProN", sans-serif;
   min-width: 320px;
 }
 
 body::before {
-  display: none;
+  position: fixed;
+  top: -62vw;
+  left: 50%;
+  z-index: -1;
+  width: 124vw;
+  height: 124vw;
+  content: "";
+  border: 1px solid rgba(52, 83, 70, .16);
+  border-radius: 50%;
+  box-shadow: 0 0 0 18px rgba(198, 158, 111, .035), 0 0 0 38px rgba(52, 83, 70, .07), 0 0 0 56px rgba(198, 158, 111, .025);
+  transform: translateX(-50%);
 }
 
 .site-header {
