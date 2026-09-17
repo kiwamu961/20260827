@@ -135,6 +135,11 @@ input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rg
 .upload-icon { display: grid; width: 39px; height: 39px; place-items: center; color: white; background: var(--accent); border-radius: 50%; font-size: 23px; font-weight: 300; }
 .drop-zone h3 { margin: 15px 0 5px; font-size: 15px; }
 .drop-zone p { margin: 0; color: var(--muted); font-size: 13px; }
+.upload-choice-list { display: flex; align-items: center; gap: 8px; margin-top: 7px; color: #9aa59b; font-size: 12px; }
+.upload-choice-list .browse-link { padding: 7px 10px; background: #fff5f1; border: 1px solid #f0c8bb; border-radius: 5px; text-decoration: none; }
+.upload-choice-list .folder-link { color: #476f52; background: #eef7ed; border-color: #c8dec5; }
+.upload-choice-list .browse-link:hover { border-color: var(--accent); }
+.upload-choice-list .folder-link:hover { border-color: #6a9a72; }
 .drop-zone small { margin-top: 13px; color: #9aa59b; font-size: 11px; }
 .browse-link { color: var(--accent-dark); font-weight: 800; text-decoration: underline; cursor: pointer; }
 

@@ -47,11 +47,17 @@
         <label class="field-label" for="propertyId">物件識別子 <span>必須</span></label>
         <input id="propertyId" name="propertyId" type="text" placeholder="例：SHINJUKU-203" autocomplete="off" required>
 
-        <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-controls="photoInput" aria-describedby="dropHint">
+        <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-controls="photoInput folderInput" aria-describedby="dropHint">
           <input id="photoInput" name="photos" type="file" accept="image/jpeg,image/png" multiple>
+          <input id="folderInput" name="photoFolder" type="file" accept="image/jpeg,image/png" webkitdirectory directory multiple>
           <div class="upload-icon" aria-hidden="true">↑</div>
           <h3>写真をここにドロップ</h3>
-          <p id="dropHint">または <label for="photoInput" class="browse-link">ファイルを選択</label></p>
+          <p id="dropHint">または</p>
+          <div class="upload-choice-list">
+            <label for="photoInput" class="browse-link">写真を選択</label>
+            <span aria-hidden="true">または</span>
+            <label for="folderInput" class="browse-link folder-link">フォルダを選択</label>
+          </div>
           <small id="uploadLimitHint">JPG・PNG形式 / 1回につき最大50枚</small>
         </div>
 

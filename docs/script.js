@@ -26,6 +26,7 @@ const correctionView = document.getElementById("correctionView");
 const uploadForm = document.getElementById("uploadForm");
 const propertyIdInput = document.getElementById("propertyId");
 const photoInput = document.getElementById("photoInput");
+const folderInput = document.getElementById("folderInput");
 const dropZone = document.getElementById("dropZone");
 const fileSummary = document.getElementById("fileSummary");
 const fileCount = document.getElementById("fileCount");
@@ -434,6 +435,11 @@ photoInput.addEventListener("change", (event) => {
   event.target.value = "";
 });
 
+folderInput.addEventListener("change", (event) => {
+  addFiles(event.target.files);
+  event.target.value = "";
+});
+
 ["dragenter", "dragover"].forEach((eventName) => {
   dropZone.addEventListener(eventName, (event) => {
     event.preventDefault();
@@ -450,7 +456,7 @@ photoInput.addEventListener("change", (event) => {
 
 dropZone.addEventListener("drop", (event) => addFiles(event.dataTransfer.files));
 dropZone.addEventListener("click", (event) => {
-  if (event.target !== photoInput && event.target.tagName !== "LABEL") photoInput.click();
+  if (event.target !== photoInput && event.target !== folderInput && event.target.tagName !== "LABEL") photoInput.click();
 });
 dropZone.addEventListener("keydown", (event) => {
   if (event.key === "Enter" || event.key === " ") {
