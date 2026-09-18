@@ -50,6 +50,7 @@ app.add_middleware(
     ],
     allow_methods=["POST"],
     allow_headers=["*"],
+    allow_private_network=True,
 )
 
 
