@@ -37,6 +37,46 @@ style: |
 	section th,
 	section td {
 		padding: 6px 8px;
+		vertical-align: top;
+	}
+	section.requirements {
+		align-items: flex-start;
+		justify-content: flex-start;
+		padding-top: 42px;
+	}
+	section.requirements table {
+		width: 100%;
+		table-layout: fixed;
+		margin-top: 12px;
+		font-size: 15px;
+		line-height: 1.25;
+	}
+	section.requirements th,
+	section.requirements td {
+		padding: 5px 7px;
+		word-break: break-word;
+	}
+	section.requirements th:nth-child(1),
+	section.requirements td:nth-child(1) {
+		width: 11%;
+		min-width: 76px;
+		white-space: nowrap !important;
+		word-break: keep-all;
+		overflow-wrap: normal;
+		overflow: visible;
+	}
+	section.requirements th:nth-child(2),
+	section.requirements td:nth-child(2) {
+		width: 21%;
+	}
+	section.requirements th:nth-child(3),
+	section.requirements td:nth-child(3) {
+		width: 14%;
+		text-align: center;
+	}
+	section.requirements th:nth-child(4),
+	section.requirements td:nth-child(4) {
+		width: 56%;
 	}
 ---
 
@@ -170,6 +210,8 @@ PhotoSortは、物件写真をAIで分類し、担当者の確認・修正作業
 
 ---
 
+<!-- _class: requirements -->
+
 # 6. 要件に対する実装状況
 
 | ID | 機能 | 状況 | 確認内容・残課題 |
@@ -181,6 +223,8 @@ PhotoSortは、物件写真をAIで分類し、担当者の確認・修正作業
 | F-005 | 分類カテゴリ表示 | 達成 | 7カテゴリと未分類のタブ・一覧を実装 |
 
 ---
+
+<!-- _class: requirements -->
 
 # 6. 要件に対する実装状況（続き）
 
